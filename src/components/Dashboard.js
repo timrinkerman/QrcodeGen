@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import { Card, Button, Alert } from 'react-bootstrap'
 import {useAuth} from '../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
+import { useForm } from "react-hook-form"
+
+
 export default function Dashboard() {
     const [error, setError] = useState("")
     const { currentUser, logout } = useAuth()
     const history = useHistory()
-
+    const {register, handleSubmit} = useForm()
     async function handleLogout() {
       setError('')
       try{
@@ -17,6 +20,10 @@ export default function Dashboard() {
       }
     }
     
+    const onSubmit = (data) => {
+      console.log(data)
+    }
+
     return (
         <>
         <Card>
@@ -24,12 +31,21 @@ export default function Dashboard() {
             <h2 className="text-center mb-4">Profile</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
                 <strong>Email:</strong>{currentUser.email}
-                <Link to="/update-profile" className='btn btn-primary w-100mt-3'></Link>
+                <Link to="/update-profile" className='btn btn-primary w-100mt-3'>Update Profile</Link>
           </Card.Body>
         </Card>
         <div className="w-100 text-center mt-2">
          <Button variant="link" onClick={handleLogout}>Log Out</Button>
         </div>
+        <Card>
+        <Card.Body>
+            <h2 className="text-center mb-4">Profile</h2>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <input ref={register} type="file" name="picture" />
+          <button>Submit</button>
+        </form>
+        </Card.Body>
+        </Card>
         </>
     )
 }
