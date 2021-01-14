@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, Button, Alert } from 'react-bootstrap'
 import {useAuth} from '../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
 import { useForm } from "react-hook-form"
+import firebase from "../firebase"
 
 
 export default function Dashboard() {
@@ -10,6 +11,10 @@ export default function Dashboard() {
     const { currentUser, logout } = useAuth()
     const history = useHistory()
     const {register, handleSubmit} = useForm()
+    const [users, setUsers] = useState([])
+    const [loading, setLoading] = useState(false)
+    const ref = firebase.firestore().collection("users")
+    
     async function handleLogout() {
       setError('')
       try{
@@ -22,20 +27,35 @@ export default function Dashboard() {
     
     const onSubmit = (data) => {
       console.log(data)
-      fetch("https://qrcode-monkey.p.rapidapi.com/qr/uploadImage", {
-	"method": "POST",
-	"headers": {
-		"x-rapidapi-key": "6769fc4edbmsh022653918a3cbd9p1d66ddjsne185340ac03d",
-		"x-rapidapi-host": "qrcode-monkey.p.rapidapi.com"
-	}
-})
+
+
 .then(response => {
 	console.log(response);
 })
 .catch(err => {
 	console.error(err);
-});
-    }
+})};
+
+function getUsers(){
+  setLoading(true);
+  ref.onSnapshot((querySnapshot) => {
+    console.log(querySnapshot)
+    const items = [];
+    querySnapshot.forEach((docs) => {
+      items.push(docs.data());
+    });
+    setUsers(items)
+    setLoading(false)
+    console.log(items)
+  })
+}
+
+// useEffect(() => {
+// getUsers();
+// },);
+
+
+ 
     return (
         <>
         <Card>
@@ -58,6 +78,11 @@ export default function Dashboard() {
         </form>
         </Card.Body>
         </Card>
+        <Button variant="link" onClick={getUsers}></Button>
+        <div>{users.map((user)=>(
+                                                      <div>key={user.id}
+                                                      <h2>{user.name}</h2>
+                                                      </div>))}Find Friends</div>
         </>
     )
 }
