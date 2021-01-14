@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Card, Button, Alert } from 'react-bootstrap'
 import {useAuth} from '../contexts/AuthContext'
 import { Link, useHistory } from 'react-router-dom'
 import { useForm } from "react-hook-form"
-import firebase from "../firebase"
+import  firebase  from '../firebase'
 
 
 export default function Dashboard() {
     const [error, setError] = useState("")
+    const [users, setUsers] = useState([])
+    const [loading, setLoading] = useState(false)
     const { currentUser, logout } = useAuth()
     const history = useHistory()
     const {register, handleSubmit} = useForm()
-    const [users, setUsers] = useState([])
-    const [loading, setLoading] = useState(false)
-    const ref = firebase.firestore().collection("users")
-    
+    const ref = firebase.firestore().collection('users')
+    console.log(ref)
     async function handleLogout() {
       setError('')
       try{
@@ -36,18 +36,18 @@ export default function Dashboard() {
 	console.error(err);
 })};
 
-function getUsers(){
+function getUsers() {
   setLoading(true);
   ref.onSnapshot((querySnapshot) => {
     console.log(querySnapshot)
     const items = [];
-    querySnapshot.forEach((docs) => {
-      items.push(docs.data());
+    querySnapshot.forEach((doc) => {
+      items.push(doc.data());
     });
     setUsers(items)
     setLoading(false)
     console.log(items)
-  })
+  });
 }
 
 // useEffect(() => {
